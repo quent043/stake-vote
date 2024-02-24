@@ -62,7 +62,7 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
 
     function stake(uint256 _amount, address _token) external {
         require(allowedTokenList[_token], "Token not allowed");
-        IERC20Upgradeable(_token).safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20Upgradeable(_token).transferFrom(msg.sender, address(this), _amount);
 
         userToTokenToStake[msg.sender][_token] += _amount;
 
@@ -73,7 +73,7 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
         require(userToTokenToStake[msg.sender][_token] >= _amount, "Insufficient staked amount");
         userToTokenToStake[msg.sender][_token] -= _amount;
 
-        IERC20Upgradeable(_token).safeTransfer(msg.sender, _amount);
+        IERC20Upgradeable(_token).transfer(msg.sender, _amount);
 
         emit UnStaked(msg.sender, _token, _amount);
     }

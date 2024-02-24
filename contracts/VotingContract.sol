@@ -23,9 +23,15 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
     // =========================== Mappings ==============================
 
+    mapping(uint256 => mapping(address => Vote)) public surveyToVoterToVote;
+
     // =========================== Events ==============================
 
     // =========================== View functions ==============================
+
+    function hasVoted(uint256 _surveyId, address _voter) external view returns (bool) {
+        return surveyToVoterToVote[_surveyId][_voter].voted;
+    }
 
     // =========================== Initializers ==============================
 
@@ -48,15 +54,19 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
 
     function vote(uint256 _surveyId, bool _vote) public {
-        ISurveyContract.Survey storage survey = surveyContract.getSurvey[_surveyId];
+        // Create a function "afterVote" in SurveyContract to update the vote count.With new role ONLY_VOTING_CONTRACT
+        ISurveyContract.Survey storage survey = surveyContract.getSurvey(_surveyId);
         require(survey.active, "Survey not active");
-        require(!survey.votes[msg.sender].voted, "Already voted");
+        Vote storage userVote = surveyToVoterToVote[_surveyId][msg.sender];
+        require(!userVote.voted, "Already voted");
 
         //TODO check is need getter instead
         uint256 stakedAmount = stakingContract.userToTokenToStake(msg.sender, survey.tokenAddress);
         require(stakedAmount >= survey.minimumStake, "Insufficient stake for voting");
 
-        survey.votes[msg.sender] = Vote(true, _vote);
+        userVote.voted = true;
+        userVote.vote = _vote;
+
         if(_vote) {
             ++survey.yesCount;
         } else {

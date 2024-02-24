@@ -15,7 +15,6 @@ interface ISurveyContract {
         uint256 noCount;
         uint256 minimumStake;
         uint256 endTimestamp;
-        mapping(address => IVotingContract.Vote) votes;
     }
 
     // Events
@@ -25,8 +24,6 @@ interface ISurveyContract {
 
     // Functions
     function getSurvey(uint256 surveyId) external view returns (Survey memory);
-
-    function hasVoted(uint256 _surveyId, address user) external view returns (bool);
 
     function updateSurveyCost(uint256 _newCost) external;
 

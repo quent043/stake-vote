@@ -34,7 +34,6 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         uint256 noCount;
         uint256 minimumStake;
         uint256 endTimestamp;
-        mapping(address => IVotingContract.Vote) votes;
     }
 
     // =========================== Mappings ==============================
@@ -57,10 +56,6 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 //    function getSurvey(uint256 surveyId) external view returns (Survey memory) {
 //        return surveys[surveyId];
 //    }
-
-    function hasVoted(uint256 _surveyId, address _voter) external view returns (bool) {
-        return surveys[_surveyId].votes[_voter].voted;
-    }
 
 
     // =========================== Initializers ==============================

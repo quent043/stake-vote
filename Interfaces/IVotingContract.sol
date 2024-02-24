@@ -10,6 +10,8 @@ interface IVotingContract {
     }
 
     // Functions
+    function hasVoted(uint256 _surveyId, address _voter) external view returns (bool);
+
     function vote(uint256 _surveyId, bool _vote) external;
 
     function withdraw() external;
