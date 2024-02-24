@@ -7,8 +7,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 contract Staking is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
-    IERC20Upgradeable public token;
-
     mapping(address => bool) public allowedTokenList;
     mapping(address => mapping(address => uint256)) public userToTokenToStake;
 
@@ -37,6 +35,11 @@ contract Staking is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
 
     function isTokenAllowed(address _tokenAddress) public view returns (bool) {
         return allowedTokenList[_tokenAddress];
+    }
+
+    //TODO needed?
+    function getStakedAmount(address user, address token) public view returns (uint256) {
+        return userToTokenToStake[user][token];
     }
 
 
