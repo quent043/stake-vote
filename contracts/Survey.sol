@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "../Interfaces/IStaking.sol";
+import "../Interfaces/IVoting.sol";
 
 contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
