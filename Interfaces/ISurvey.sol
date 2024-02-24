@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
 import "./IVoting.sol";
 
 interface ISurvey {
@@ -24,6 +25,8 @@ interface ISurvey {
 
     // Functions
     function getSurvey(uint256 surveyId) external view returns (Survey);
+
+    function hasVoted(uint256 _surveyId, address user) external view returns (bool);
 
     function updateSurveyCost(uint256 _newCost) external;
 

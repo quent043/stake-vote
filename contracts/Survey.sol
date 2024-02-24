@@ -58,6 +58,10 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
         return surveys[surveyId];
     }
 
+    function hasVoted(uint256 _surveyId, address _voter) external view returns (bool) {
+        return surveys[_surveyId].votes[_voter].voted;
+    }
+
 
     // =========================== Initializers ==============================
 

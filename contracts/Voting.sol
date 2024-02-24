@@ -26,7 +26,6 @@ contract Voting is UUPSUpgradeable, Initializable {
 
     // =========================== View functions ==============================
 
-
     // =========================== Initializers ==============================
 
     /// @custom:oz-upgrades-unsafe-allow constructor
