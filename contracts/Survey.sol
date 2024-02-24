@@ -16,13 +16,14 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
 
     // =========================== Variables & Declarations ==============================
 
-    uint256 public SURVEY_COST = 1 ether;
+    uint256 public surveyCost = 1 ether;
 
     CountersUpgradeable.Counter public nextSurveyId;
 
     IStaking public stakingContract;
 
-    IVoting public votingContract;
+    //TODO not sure I need, only need struct Vote
+//    IVoting public votingContract;
 
     struct Survey {
         address owner;
@@ -69,20 +70,20 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
      * @notice First initializer function
      * @param
      */
-    function initialize(address _talentLayerPlatformIdAddress, address _votingContractAddress) public initializer {
+    function initialize(address _stakingContractAddress) public initializer {
         __AccessControl_init();
         __UUPSUpgradeable_init();
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         // Increment counter to start survey ids at index 1
         nextSurveyId.increment();
         stakingContract = IStakingContract(_stakingContractAddress);
-        votingContract = IStakingContract(_votingContractAddress);
+        updateSurveyCost(1 ether);
     }
 
     // =========================== Public functions ==============================
 
     function updateSurveyCost (uint256 _newCost) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        SURVEY_COST = _newCost;
+        surveyCost = _newCost;
 
         emit SurveyCostUpdated(_newCost);
     }
@@ -95,7 +96,7 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
         uint256 _durationInDays
     ) external {
         require(stakingContract.isTokenAllowed(token) == true, "Token not allowed");
-        require(msg.value == SURVEY_COST, "Incorrect amount of ETH for survey creation");
+        require(msg.value == surveyCost, "Incorrect amount of ETH for survey creation");
 
         uint256 currentSurveyId = nextSurveyId.current();
 

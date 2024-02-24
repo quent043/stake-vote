@@ -13,6 +13,7 @@ contract Voting is UUPSUpgradeable, Initializable {
     // =========================== Variables & Declarations ==============================
 
     IStaking public stakingContract;
+    ISurvey public surveyContract;
 
     struct Vote {
         bool voted;
@@ -37,15 +38,17 @@ contract Voting is UUPSUpgradeable, Initializable {
      * @notice First initializer function
      * @param
      */
-    function initialize(address _stakingContractAddress) public initializer {
+    function initialize(address _stakingContractAddress, address _votingContractAddress) public initializer {
         __UUPSUpgradeable_init();
         stakingContract = IStakingContract(_stakingContractAddress);
+        votingContract = IStakingContract(_votingContractAddress);
     }
 
     // =========================== Public functions ==============================
 
 
     function vote(uint256 _surveyId, bool _vote) public {
+        //TODO implement staking check + all security (no double vote etc.)
         Survey storage survey = surveys[_surveyId];
         require(survey.active, "Survey not active");
         require(!survey.votes[msg.sender].voted, "Already voted");
