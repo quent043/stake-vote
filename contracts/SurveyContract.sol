@@ -18,6 +18,8 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
     uint256 public surveyCost = 1 ether;
 
+    bytes32 public constant VOTING_CONTRACT_ROLE = keccak256("VOTING_CONTRACT_ROLE");
+
     CountersUpgradeable.Counter public nextSurveyId;
 
     IStakingContract public stakingContract;
@@ -49,6 +51,8 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     event SurveyCancelled(uint256 surveyId);
 
     event SurveyCostUpdated(uint256 newCost);
+
+    event SurveyVoted(uint256 surveyId, address voter, bool vote);
 
 
     // =========================== View functions ==============================
@@ -91,7 +95,7 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         string calldata _descriptionUri,
         uint256 _minimumStake,
         uint256 _durationInDays
-    ) external {
+    ) payable public {
         require(stakingContract.isTokenAllowed(_tokenAddress) == true, "Token not allowed");
         require(msg.value == surveyCost, "Incorrect amount of ETH for survey creation");
 
@@ -120,6 +124,18 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         surveys[_surveyId].active = false;
 
         emit SurveyCancelled(_surveyId);
+    }
+
+    function afterVote(uint256 _surveyId, address _voterAddress, bool _vote) external onlyRole(VOTING_CONTRACT_ROLE) {
+        Survey storage survey = surveys[_surveyId];
+        require(survey.active, "Survey not active");
+        if (_vote) {
+            survey.yesCount += 1;
+        } else {
+            survey.noCount += 1;
+        }
+
+        emit SurveyVoted(_surveyId, _voterAddress, _vote);
     }
 
 

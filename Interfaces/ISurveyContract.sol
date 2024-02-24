@@ -36,5 +36,7 @@ interface ISurveyContract {
 
     function cancelSurvey(uint256 _surveyId) external;
 
+    function afterVote(uint256 _surveyId, address _voterAddress, bool _vote) external;
+
     function withdraw() external;
 }

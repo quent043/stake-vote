@@ -27,6 +27,9 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
     // =========================== Events ==============================
 
+    event Voted(uint256 surveyId, address voter, bool vote);
+
+
     // =========================== View functions ==============================
 
     function hasVoted(uint256 _surveyId, address _voter) external view returns (bool) {
@@ -54,8 +57,7 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
 
     function vote(uint256 _surveyId, bool _vote) public {
-        // Create a function "afterVote" in SurveyContract to update the vote count.With new role ONLY_VOTING_CONTRACT
-        ISurveyContract.Survey storage survey = surveyContract.getSurvey(_surveyId);
+        ISurveyContract.Survey memory survey = surveyContract.getSurvey(_surveyId);
         require(survey.active, "Survey not active");
         Vote storage userVote = surveyToVoterToVote[_surveyId][msg.sender];
         require(!userVote.voted, "Already voted");
@@ -67,11 +69,9 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         userVote.voted = true;
         userVote.vote = _vote;
 
-        if(_vote) {
-            ++survey.yesCount;
-        } else {
-            ++survey.noCount;
-        }
+        surveyContract.afterVote(_surveyId, msg.sender, _vote);
+
+        emit Voted(_surveyId, msg.sender, _vote);
     }
 
     function withdraw() external onlyRole(DEFAULT_ADMIN_ROLE) {
