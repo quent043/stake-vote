@@ -48,19 +48,19 @@ contract Voting is UUPSUpgradeable, Initializable {
 
 
     function vote(uint256 _surveyId, bool _vote) public {
-        //TODO implement staking check + all security (no double vote etc.)
         Survey storage survey = surveys[_surveyId];
         require(survey.active, "Survey not active");
         require(!survey.votes[msg.sender].voted, "Already voted");
 
-        uint256 stakedAmount = stakingContract.getStakedAmount(msg.sender);
+        //TODO check is need getter instead
+        uint256 stakedAmount = stakingContract.userToTokenToStake(msg.sender, survey.tokenAddress);
         require(stakedAmount >= minimumStake, "Insufficient stake for voting");
 
         survey.votes[msg.sender] = Vote(true, _vote);
         if(_vote) {
-            survey.yesCount++;
+            ++survey.yesCount;
         } else {
-            survey.noCount++;
+            ++survey.noCount;
         }
     }
 
