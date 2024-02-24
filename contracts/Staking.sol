@@ -69,7 +69,19 @@ contract Staking is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
         emit UnStaked(msg.sender, _token, _amount);
     }
 
+    function withdraw() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        payable(msg.sender).transfer(address(this).balance);
+    }
+
     // =========================== Private functions ==============================
+    // =========================== Internal functions ==============================
+
+    /**
+     * @notice Function that revert when `_msgSender()` is not authorized to upgrade the contract. Called by
+     * {upgradeTo} and {upgradeToAndCall}.
+     * @param newImplementation address of the new contract implementation
+     */
+    function _authorizeUpgrade(address newImplementation) internal override(UUPSUpgradeable) onlyRole(DEFAULT_ADMIN_ROLE) {}
 
 
 }
