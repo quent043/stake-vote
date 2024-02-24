@@ -15,4 +15,6 @@ interface IVoting {
     function hasVoted(uint256 _surveyId, address user) external view returns (bool);
 
     function getVoteDetails(uint256 _surveyId, address user) external view returns (bool voted, bool vote);
+
+    function withdraw() external;
 }
