@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "../Interfaces/IStaking.sol";
-import "../Interfaces/ISurvey.sol";
+import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+import "../Interfaces/IStakingContract.sol";
+import "../Interfaces/ISurveyContract.sol";
 
-contract Voting is UUPSUpgradeable, Initializable {
+contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
 
 
     // =========================== Variables & Declarations ==============================
 
-    IStaking public stakingContract;
-    ISurvey public surveyContract;
+    IStakingContract public stakingContract;
+    ISurveyContract public surveyContract;
 
     struct Vote {
         bool voted;
@@ -35,25 +36,25 @@ contract Voting is UUPSUpgradeable, Initializable {
 
     /**
      * @notice First initializer function
-     * @param
      */
-    function initialize(address _stakingContractAddress, address _votingContractAddress) public initializer {
-        __UUPSUpgradeable_init();
+    function initialize(address _stakingContractAddress, address _surveyContractAddress) public initializer {
+//        __UUPSUpgradeable_init();
+        __AccessControl_init();
         stakingContract = IStakingContract(_stakingContractAddress);
-        votingContract = IStakingContract(_votingContractAddress);
+        surveyContract = ISurveyContract(_surveyContractAddress);
     }
 
     // =========================== Public functions ==============================
 
 
     function vote(uint256 _surveyId, bool _vote) public {
-        Survey storage survey = surveys[_surveyId];
+        ISurveyContract.Survey storage survey = surveyContract.getSurvey[_surveyId];
         require(survey.active, "Survey not active");
         require(!survey.votes[msg.sender].voted, "Already voted");
 
         //TODO check is need getter instead
         uint256 stakedAmount = stakingContract.userToTokenToStake(msg.sender, survey.tokenAddress);
-        require(stakedAmount >= minimumStake, "Insufficient stake for voting");
+        require(stakedAmount >= survey.minimumStake, "Insufficient stake for voting");
 
         survey.votes[msg.sender] = Vote(true, _vote);
         if(_vote) {

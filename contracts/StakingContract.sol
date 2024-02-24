@@ -1,12 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
+
+/**TODO: finir les améliorations sur la PartI
+* TODO: audit contracts
+Natspec
+Tests
+*/
+
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-contract Staking is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
+contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
     mapping(address => bool) public allowedTokenList;
     mapping(address => mapping(address => uint256)) public userToTokenToStake;
 
@@ -22,11 +29,10 @@ contract Staking is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
 
     /**
      * @notice First initializer function
-     * @param
      */
     function initialize() public initializer {
         __AccessControl_init();
-        __UUPSUpgradeable_init();
+//        __UUPSUpgradeable_init();
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -63,7 +69,7 @@ contract Staking is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
         emit Staked(msg.sender, _token, _amount);
     }
 
-    function unStake(uint256 _amount) external {
+    function unStake(uint256 _amount, address _token) external {
         require(userToTokenToStake[msg.sender][_token] >= _amount, "Insufficient staked amount");
         userToTokenToStake[msg.sender][_token] -= _amount;
 

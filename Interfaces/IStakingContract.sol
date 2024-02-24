@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IStaking {
+interface IStakingContract {
     // Events
     event Staked(address indexed user, address token, uint256 amount);
 

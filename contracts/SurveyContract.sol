@@ -2,15 +2,15 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "../Interfaces/IStaking.sol";
-import "../Interfaces/IVoting.sol";
+import "../Interfaces/IStakingContract.sol";
+import "../Interfaces/IVotingContract.sol";
 
-contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
+contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
 
@@ -20,7 +20,7 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
 
     CountersUpgradeable.Counter public nextSurveyId;
 
-    IStaking public stakingContract;
+    IStakingContract public stakingContract;
 
     //TODO not sure I need, only need struct Vote
 //    IVoting public votingContract;
@@ -34,7 +34,7 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
         uint256 noCount;
         uint256 minimumStake;
         uint256 endTimestamp;
-        mapping(address => Vote) votes;
+        mapping(address => IVotingContract.Vote) votes;
     }
 
     // =========================== Mappings ==============================
@@ -54,9 +54,9 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
 
     // =========================== View functions ==============================
 
-    function getSurvey(uint256 surveyId) external view returns (Survey memory) {
-        return surveys[surveyId];
-    }
+//    function getSurvey(uint256 surveyId) external view returns (Survey memory) {
+//        return surveys[surveyId];
+//    }
 
     function hasVoted(uint256 _surveyId, address _voter) external view returns (bool) {
         return surveys[_surveyId].votes[_voter].voted;
@@ -72,11 +72,10 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
 
     /**
      * @notice First initializer function
-     * @param
      */
     function initialize(address _stakingContractAddress) public initializer {
         __AccessControl_init();
-        __UUPSUpgradeable_init();
+//        __UUPSUpgradeable_init();
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         // Increment counter to start survey ids at index 1
         nextSurveyId.increment();
@@ -95,14 +94,14 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
     function createSurvey(
         address _tokenAddress,
         string calldata _descriptionUri,
-        address _tokenAddress,
         uint256 _minimumStake,
         uint256 _durationInDays
     ) external {
-        require(stakingContract.isTokenAllowed(token) == true, "Token not allowed");
+        require(stakingContract.isTokenAllowed(_tokenAddress) == true, "Token not allowed");
         require(msg.value == surveyCost, "Incorrect amount of ETH for survey creation");
 
         uint256 currentSurveyId = nextSurveyId.current();
+        uint256 endTimeStamp = block.timestamp + _durationInDays * 1 days;
 
         surveys[currentSurveyId] = Survey({
             owner: msg.sender,
@@ -112,12 +111,12 @@ contract Survey is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
             yesCount: 0,
             noCount: 0,
             minimumStake: _minimumStake,
-            endTimestamp: block.timestamp + _durationInDays * 1 days
+            endTimestamp: endTimeStamp
         });
 
         nextSurveyId.increment();
 
-        emit SurveyCreated(currentSurveyId, msg.sender, _descriptionUri, _tokenAddress, _minimumStake, block.timestamp + _durationInDays * 1 days);
+        emit SurveyCreated(currentSurveyId, msg.sender, _descriptionUri, _tokenAddress, _minimumStake, endTimeStamp);
     }
 
     function cancelSurvey(uint256 _surveyId) external {

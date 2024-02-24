@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./IVoting.sol";
+import "./IVotingContract.sol";
 
-interface ISurvey {
+interface ISurveyContract {
 
     // Structs
     struct Survey {
@@ -15,7 +15,7 @@ interface ISurvey {
         uint256 noCount;
         uint256 minimumStake;
         uint256 endTimestamp;
-        mapping(address => Vote) votes;
+        mapping(address => IVotingContract.Vote) votes;
     }
 
     // Events
@@ -24,7 +24,7 @@ interface ISurvey {
     event SurveyCostUpdated(uint256 newCost);
 
     // Functions
-    function getSurvey(uint256 surveyId) external view returns (Survey);
+    function getSurvey(uint256 surveyId) external view returns (Survey memory);
 
     function hasVoted(uint256 _surveyId, address user) external view returns (bool);
 
@@ -33,7 +33,6 @@ interface ISurvey {
     function createSurvey(
         address _tokenAddress,
         string calldata _descriptionUri,
-        address _tokenAddress,
         uint256 _minimumStake,
         uint256 _durationInDays
     ) external;
