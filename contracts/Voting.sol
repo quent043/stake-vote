@@ -61,6 +61,10 @@ contract Voting is UUPSUpgradeable, Initializable {
         }
     }
 
+    function withdraw() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        payable(msg.sender).transfer(address(this).balance);
+    }
+
     // =========================== Private functions ==============================
     // =========================== Internal functions ==============================
 
