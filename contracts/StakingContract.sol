@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 /**TODO: finir les améliorations sur la PartI
 * TODO: audit contracts
+* TODO: NatSpec
 Natspec
 Tests
 */
@@ -52,8 +53,8 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
     // =========================== Public functions ==============================
 
 
-    function addAllowedToken(address _tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        allowedTokenList[_tokenAddress] = true;
+    function updateAllowedTokenList(address _tokenAddress, bool _isAllowed) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        allowedTokenList[_tokenAddress] = _isAllowed;
     }
 
     function removeAllowedToken(address _tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {

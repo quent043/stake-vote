@@ -24,9 +24,6 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
     IStakingContract public stakingContract;
 
-    //TODO not sure I need, only need struct Vote
-//    IVoting public votingContract;
-
     struct Survey {
         address owner;
         string descriptionUri;

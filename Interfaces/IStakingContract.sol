@@ -13,7 +13,7 @@ interface IStakingContract {
     function userToTokenToStake(address _user, address _token) external view returns (uint256);
 
     // Public functions
-    function addAllowedToken(address _tokenAddress) external;
+    function updateAllowedTokenList(address _tokenAddress, bool _isAllowed) external;
 
     function removeAllowedToken(address _tokenAddress) external;
 
