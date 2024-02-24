@@ -30,8 +30,6 @@ contract Staking is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
         __AccessControl_init();
         __UUPSUpgradeable_init();
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        // Increment counter to start profile ids at index 1
-        nextProfileId.increment();
     }
 
     // =========================== View functions ==============================
