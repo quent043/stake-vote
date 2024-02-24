@@ -1,7 +1,6 @@
 import {ethers, upgrades} from "hardhat";
 import {StakingContract, SurveyContract, VotingContract, BarERC20} from "../../typechain-types";
 
-//TODO double check variables in constructors, ya eu des changements
 export async function deploy(): Promise<[StakingContract, SurveyContract, VotingContract, BarERC20]> {
     // Deploy Staking Contract
     const Staking = await ethers.getContractFactory('Staking');
@@ -22,6 +21,11 @@ export async function deploy(): Promise<[StakingContract, SurveyContract, Voting
     const voting = await upgrades.deployProxy(Voting, votingContractArgs, { initializer: 'initialize' });
     await voting.deployed();
     console.log('Voting deployed to:', voting.address);
+
+    // Grant voting contract role to voting contract
+    const votingContractRole = await survey.VOTING_CONTRACT_ROLE();
+    await survey.grantRole(votingContractRole, voting.address);
+
 
     // Deploy BatToken Token
     const BarErc20 = await ethers.getContractFactory('BarERC20')
