@@ -56,13 +56,14 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     // =========================== Public functions ==============================
 
 
-    function vote(uint256 _surveyId, bool _vote) public {
+    function vote(uint256 _surveyId, bool _vote) external {
         ISurveyContract.Survey memory survey = surveyContract.getSurvey(_surveyId);
         require(survey.active, "Survey not active");
         Vote storage userVote = surveyToVoterToVote[_surveyId][msg.sender];
         require(!userVote.voted, "Already voted");
 
-        //TODO check is need getter instead
+        //TODO add check for endTimestamp
+
         uint256 stakedAmount = stakingContract.userToTokenToStake(msg.sender, survey.tokenAddress);
         require(stakedAmount >= survey.minimumStake, "Insufficient stake for voting");
 
@@ -75,7 +76,7 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     }
 
     /**
-     * @notice: Allow receiving of ETH
+     * Allow receiving of ETH
      */
     receive() external payable {}
 

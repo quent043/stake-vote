@@ -31,9 +31,11 @@ export async function deploy(): Promise<[StakingContract, SurveyContract, Voting
     const BarErc20 = await ethers.getContractFactory('BarERC20')
     const barErc20 = await BarErc20.deploy()
 
+    console.log('BarERC20 deployed to:', barErc20.address)
+
     return  [staking as StakingContract, survey as SurveyContract, voting as VotingContract, barErc20 as BarERC20];
 }
 
 deploy()
-    .then((contracts) => console.log('Contracts deployed successfully:'))
+    .then((contracts) => console.log('Contracts deployed successfully:', contracts.length))
     .catch((error) => console.error('An error occurred during deployment:', error));

@@ -136,7 +136,7 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     }
 
     /**
-     * @notice: Allow receiving of ETH
+     * Allow receiving of ETH
      */
     receive() external payable {}
 

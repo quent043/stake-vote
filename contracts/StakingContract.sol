@@ -44,7 +44,6 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
         return allowedTokenList[_tokenAddress];
     }
 
-    //TODO needed?
     function getStakedAmount(address user, address token) public view returns (uint256) {
         return userToTokenToStake[user][token];
     }
@@ -54,6 +53,7 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
 
 
     function updateAllowedTokenList(address _tokenAddress, bool _isAllowed) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_tokenAddress != address(0), "Token address cannot be 0x0");
         allowedTokenList[_tokenAddress] = _isAllowed;
     }
 
@@ -63,6 +63,7 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
 
     function stake(uint256 _amount, address _token) external {
         require(allowedTokenList[_token], "Token not allowed");
+
         IERC20Upgradeable(_token).transferFrom(msg.sender, address(this), _amount);
 
         userToTokenToStake[msg.sender][_token] += _amount;
@@ -80,7 +81,7 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
     }
 
     /**
-     * @notice: Allow receiving of ETH
+     * Allow receiving of ETH
      */
     receive() external payable {}
 
