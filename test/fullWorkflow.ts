@@ -270,6 +270,17 @@ describe('Voting Staking global testing', function () {
                 ).to.emit(votingContract, "Voted").withArgs(surveyId, alice.address, true);
 
                 expect(await votingContract.hasVoted(surveyId, alice.address)).to.equal(true);
+
+                // Carol stakes enough tokens to vote
+                await barToken.connect(carol).approve(stakingContract.address, minimumStake);
+                await stakingContract.connect(carol).stake(minimumStake, barToken.address);
+
+                // Carol votes in the survey
+                await expect(
+                    votingContract.connect(carol).vote(surveyId, false)
+                ).to.emit(votingContract, "Voted").withArgs(surveyId, carol.address, false);
+
+                expect(await votingContract.hasVoted(surveyId, carol.address)).to.equal(true);
             });
 
             it("Should not allow voting without sufficient stake", async function () {
@@ -290,7 +301,7 @@ describe('Voting Staking global testing', function () {
                 const surveyId = 2; // Survey in which Alice voted "true"
                 const survey = await surveyContract.getSurvey(surveyId);
                 expect(survey.yesCount).to.equal(1); // 1 vote for
-                expect(survey.noCount).to.equal(0); // 0 vote against
+                expect(survey.noCount).to.equal(1); // 1 vote against
             })
 
             it("Should revert when called by an admin without VOTING_CONTRACT_ROLE", async function () {
