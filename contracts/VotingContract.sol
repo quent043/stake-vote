@@ -74,6 +74,11 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         emit Voted(_surveyId, msg.sender, _vote);
     }
 
+    /**
+     * @notice: Allow receiving of ETH
+     */
+    receive() external payable {}
+
     function withdraw() external onlyRole(DEFAULT_ADMIN_ROLE) {
         payable(msg.sender).transfer(address(this).balance);
     }

@@ -135,6 +135,10 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         emit SurveyVoted(_surveyId, _voterAddress, _vote);
     }
 
+    /**
+     * @notice: Allow receiving of ETH
+     */
+    receive() external payable {}
 
     function withdraw() external onlyRole(DEFAULT_ADMIN_ROLE) {
         payable(msg.sender).transfer(address(this).balance);

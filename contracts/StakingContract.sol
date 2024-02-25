@@ -79,6 +79,11 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
         emit UnStaked(msg.sender, _token, _amount);
     }
 
+    /**
+     * @notice: Allow receiving of ETH
+     */
+    receive() external payable {}
+
     function withdraw() external onlyRole(DEFAULT_ADMIN_ROLE) {
         payable(msg.sender).transfer(address(this).balance);
     }
