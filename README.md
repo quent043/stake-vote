@@ -21,4 +21,4 @@ npx hardhat run scripts/deploy.ts
  - Add Arbitration (in case of a hack, to render a survey null)
  - Add NFT owning to  voting conditions
  - Use Viem (didn't have time to find good viem tools for UUPS proxy deployments)
- - Add a locking period in staking contract. Tokens are locked for the duration of the survey and can be redeemed after the end timestamp.
+ - Add a locking period in staking contract. Tokens are locked for the duration of the survey and can be redeemed after the end timestamp, or is Survey Cancelled.

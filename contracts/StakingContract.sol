@@ -3,10 +3,8 @@ pragma solidity ^0.8.0;
 
 
 /**TODO: finir les améliorations sur la PartI
-* TODO: audit contracts
 * TODO: NatSpec
 Natspec
-Tests
 */
 
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
@@ -33,7 +31,6 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
      */
     function initialize() public initializer {
         __AccessControl_init();
-//        __UUPSUpgradeable_init();
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 

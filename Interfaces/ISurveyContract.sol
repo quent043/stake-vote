@@ -9,12 +9,27 @@ interface ISurveyContract {
     struct Survey {
         address owner;
         string descriptionUri;
-        bool active;
+        SurveyStatus status;
+        SurveyResult result;
         address tokenAddress;
         uint256 yesCount;
         uint256 noCount;
         uint256 minimumStake;
         uint256 endTimestamp;
+    }
+
+    // enums
+    enum SurveyStatus {
+        Active,
+        Finished,
+        Cancelled
+    }
+
+    enum SurveyResult {
+        pending,
+        Yes,
+        No,
+        tie
     }
 
     // Events

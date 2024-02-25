@@ -24,10 +24,24 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
     IStakingContract public stakingContract;
 
+    enum SurveyStatus {
+        Active,
+        Finished,
+        Cancelled
+    }
+
+    enum SurveyResult {
+        pending,
+        Yes,
+        No,
+        tie
+    }
+
     struct Survey {
         address owner;
         string descriptionUri;
-        bool active;
+        SurveyStatus status;
+        SurveyResult result;
         address tokenAddress;
         uint256 yesCount;
         uint256 noCount;
@@ -71,7 +85,6 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
      */
     function initialize(address _stakingContractAddress) public initializer {
         __AccessControl_init();
-//        __UUPSUpgradeable_init();
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         // Increment counter to start survey ids at index 1
         nextSurveyId.increment();
@@ -102,7 +115,8 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         surveys[currentSurveyId] = Survey({
             owner: msg.sender,
             descriptionUri: _descriptionUri,
-            active: true,
+            status: SurveyStatus.Active,
+            result: SurveyResult.pending,
             tokenAddress: _tokenAddress,
             yesCount: 0,
             noCount: 0,
@@ -117,15 +131,15 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
     function cancelSurvey(uint256 _surveyId) external {
         require(surveys[_surveyId].owner == msg.sender, "Not the owner");
-        require(surveys[_surveyId].active, "Survey not active");
-        surveys[_surveyId].active = false;
+        require(surveys[_surveyId].status == SurveyStatus.Active, "Survey not active");
+        surveys[_surveyId].status = SurveyStatus.Cancelled;
 
         emit SurveyCancelled(_surveyId);
     }
 
     function afterVote(uint256 _surveyId, address _voterAddress, bool _vote) external onlyRole(VOTING_CONTRACT_ROLE) {
         Survey storage survey = surveys[_surveyId];
-        require(survey.active, "Survey not active");
+        require(survey.status == SurveyStatus.Active, "Survey not active");
         if (_vote) {
             survey.yesCount += 1;
         } else {
@@ -133,6 +147,22 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         }
 
         emit SurveyVoted(_surveyId, _voterAddress, _vote);
+    }
+
+    function endSurvey(uint256 _surveyId) external {
+        Survey storage survey = surveys[_surveyId];
+        require(survey.status == SurveyStatus.Active, "Survey not active");
+        require(block.timestamp > survey.endTimestamp, "Voting period has not ended");
+
+        if (survey.yesCount > survey.noCount) {
+            survey.result = SurveyResult.Yes;
+        } else if (survey.yesCount < survey.noCount) {
+            survey.result = SurveyResult.No;
+        } else {
+            survey.result = SurveyResult.tie;
+        }
+
+        survey.status = SurveyStatus.Finished;
     }
 
     /**

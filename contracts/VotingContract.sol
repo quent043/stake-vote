@@ -47,7 +47,6 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
      * @notice First initializer function
      */
     function initialize(address _stakingContractAddress, address _surveyContractAddress) public initializer {
-//        __UUPSUpgradeable_init();
         __AccessControl_init();
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         stakingContract = IStakingContract(_stakingContractAddress);
@@ -59,7 +58,7 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
     function vote(uint256 _surveyId, bool _vote) external {
         ISurveyContract.Survey memory survey = surveyContract.getSurvey(_surveyId);
-        require(survey.active, "Survey not active");
+        require(survey.status == ISurveyContract.SurveyStatus.Active, "Survey not active");
         require(block.timestamp <= survey.endTimestamp, "Voting period has ended");
 
         Vote storage userVote = surveyToVoterToVote[_surveyId][msg.sender];
