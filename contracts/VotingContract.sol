@@ -49,6 +49,7 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     function initialize(address _stakingContractAddress, address _surveyContractAddress) public initializer {
 //        __UUPSUpgradeable_init();
         __AccessControl_init();
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         stakingContract = IStakingContract(_stakingContractAddress);
         surveyContract = ISurveyContract(_surveyContractAddress);
     }

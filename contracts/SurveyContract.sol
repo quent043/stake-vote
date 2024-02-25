@@ -54,9 +54,9 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
     // =========================== View functions ==============================
 
-//    function getSurvey(uint256 surveyId) external view returns (Survey memory) {
-//        return surveys[surveyId];
-//    }
+    function getSurvey(uint256 surveyId) external view returns (Survey memory) {
+        return surveys[surveyId];
+    }
 
 
     // =========================== Initializers ==============================
