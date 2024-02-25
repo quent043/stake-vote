@@ -35,5 +35,5 @@ export async function deploy(): Promise<[StakingContract, SurveyContract, Voting
 }
 
 deploy()
-    .then((contracts) => console.log('Contracts deployed successfully:', contracts))
+    .then((contracts) => console.log('Contracts deployed successfully:'))
     .catch((error) => console.error('An error occurred during deployment:', error));

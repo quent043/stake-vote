@@ -35,6 +35,12 @@ describe('Voting Staking global testing', function () {
                 .connect(deployer)
                 .updateAllowedTokenList(tokenAddress, true);
         }
+
+        // Deployer Transfers 2000 BAR from deployer to each address
+        const amount = ethers.utils.parseEther("2000");
+        await barToken.connect(deployer).transfer(alice.address, amount);
+        await barToken.connect(deployer).transfer(bob.address, amount);
+        await barToken.connect(deployer).transfer(carol.address, amount);
     });
 
 
@@ -86,13 +92,23 @@ describe('Voting Staking global testing', function () {
         });
 
         describe("Withdrawal of Contract Balance", function () {
-            it("Should allow withdrawal by admin", async function () {
-                // Assuming some ether is sent to the contract in some way
-                const initialBalance = await deployer.getBalance();
+            it("Should allow withdrawal by admin and reduce contract balance", async function () {
+                const sendAmount = ethers.utils.parseEther("1.0"); // 1 ether for example
+                await alice.sendTransaction({
+                    to: stakingContract.address,
+                    value: sendAmount
+                });
+
+                const initialContractBalance = await ethers.provider.getBalance(stakingContract.address);
+                expect(initialContractBalance).to.equal(sendAmount);
+
                 await stakingContract.connect(deployer).withdraw();
-                const finalBalance = await deployer.getBalance();
-                expect(finalBalance).to.be.gt(initialBalance);
+
+                const finalContractBalance = await ethers.provider.getBalance(stakingContract.address);
+
+                expect(finalContractBalance).to.equal(0);
             });
+
 
             it("Should revert withdrawal by non-admin", async function () {
                 await expect(
