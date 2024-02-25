@@ -3,20 +3,20 @@ import {StakingContract, SurveyContract, VotingContract, BarERC20} from "../../t
 
 export async function deploy(): Promise<[StakingContract, SurveyContract, VotingContract, BarERC20]> {
     // Deploy Staking Contract
-    const Staking = await ethers.getContractFactory('Staking');
+    const Staking = await ethers.getContractFactory('StakingContract');
     const staking = await upgrades.deployProxy(Staking, [], { initializer: 'initialize' });
     await staking.deployed();
     console.log('Staking deployed to:', staking.address);
 
     // Deploy Survey Contract
-    const Survey = await ethers.getContractFactory('Survey');
+    const Survey = await ethers.getContractFactory('SurveyContract');
     const surveyContractArgs = [staking.address];
     const survey = await upgrades.deployProxy(Survey, surveyContractArgs, { initializer: 'initialize' });
     await survey.deployed();
     console.log('Survey deployed to:', survey.address);
 
     // Deploy Voting Contract
-    const Voting = await ethers.getContractFactory('Voting');
+    const Voting = await ethers.getContractFactory('VotingContract');
     const votingContractArgs = [staking.address, survey.address];
     const voting = await upgrades.deployProxy(Voting, votingContractArgs, { initializer: 'initialize' });
     await voting.deployed();
