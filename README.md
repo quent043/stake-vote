@@ -45,5 +45,5 @@ All files             |      100 |       75 |      100 |      100 |             
 ---
 
 ## Diagram
-Here is a diagram of the contracts and their interactions:
-![Diagram](./diagram.png)
+Here is a sequence diagram of the contracts and their interactions:
+![diagram.png](diagram.png)
