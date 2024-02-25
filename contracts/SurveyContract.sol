@@ -16,7 +16,7 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
 
     // =========================== Variables & Declarations ==============================
 
-    uint256 public surveyCost = 1 ether;
+    uint256 public surveyCost;
 
     bytes32 public constant VOTING_CONTRACT_ROLE = keccak256("VOTING_CONTRACT_ROLE");
 
