@@ -6,6 +6,23 @@
 This project solves Part2 using a basic Hardhat use case.
 It comes with a test file testing the deployment and all workflows.
 
+## Contracts
+
+This architecture includes 3 contracts:
+
+- BarERC20: An ERC20 token, here used for staking
+- StakingContract: A contract responsible for the staking logic
+- SurveyContract: A contract responsible for the surveys creation and management
+- VotingContract: A contract responsible for the voting logic, connected to the other 2
+
+
+---
+
+## Diagram
+Here is a sequence diagram of the contracts and their interactions:
+
+![diagram.png](diagram.png)
+
 You can run it using:
 
 ```shell
@@ -40,10 +57,3 @@ All files             |      100 |       75 |      100 |      100 |             
  - Add NFT owning to  voting conditions
  - Use Viem (didn't have time to find good viem tools for UUPS proxy deployments)
  - Add a locking period in staking contract. Tokens are locked for the duration of the survey and can be redeemed after the end timestamp.
-
-
----
-
-## Diagram
-Here is a sequence diagram of the contracts and their interactions:
-![diagram.png](diagram.png)
