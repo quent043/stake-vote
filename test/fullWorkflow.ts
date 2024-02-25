@@ -44,7 +44,7 @@ describe('Voting Staking global testing', function () {
 
     describe("StakingContract Tests", function () {
 
-        const stakeAmount = ethers.utils.parseEther("10"); // 10 tokens
+        const stakeAmount = ethers.utils.parseEther("10");
         describe("Token Staking", function () {
 
             it("Should allow approving address 0x", async function () {
@@ -76,7 +76,7 @@ describe('Voting Staking global testing', function () {
         });
 
         describe("Token Unstaking", function () {
-            const unstakeAmount = ethers.utils.parseEther("5"); // Unstaking 5 tokens
+            const unstakeAmount = ethers.utils.parseEther("5");
 
             it("Should allow unstaking of staked tokens", async function () {
                 await expect(
@@ -125,9 +125,9 @@ describe('Voting Staking global testing', function () {
     });
 
     describe("SurveyContract Tests", function () {
-        const surveyCost = ethers.utils.parseEther("1.0"); // Assuming 1 ether as the survey cost
+        const surveyCost = ethers.utils.parseEther("1.0");
         const descriptionUri = "http://example.com/survey";
-        const minimumStake = ethers.utils.parseEther("10"); // Minimum stake for voting in a survey
+        const minimumStake = ethers.utils.parseEther("10");
         const durationInDays = 7; // Duration of the survey in days
 
         describe("Create Survey", function () {
@@ -149,7 +149,7 @@ describe('Voting Staking global testing', function () {
                         descriptionUri,
                         minimumStake,
                         durationInDays,
-                        { value: ethers.utils.parseEther("0.5") } // Sending less than the required cost
+                        { value: ethers.utils.parseEther("0.5") }
                     )
                 ).to.be.revertedWith("Incorrect amount of ETH for survey creation");
             });
@@ -157,7 +157,7 @@ describe('Voting Staking global testing', function () {
 
         describe("Cancel Survey", function () {
             it("Should allow the owner to cancel their survey", async function () {
-                const nextSurveyId = await surveyContract.nextSurveyId(); // Get the last created surveyId
+                const nextSurveyId = await surveyContract.nextSurveyId();
                 const surveyId = nextSurveyId.sub(BigNumber.from(1));
                 await expect(
                     surveyContract.connect(alice).cancelSurvey(surveyId)
@@ -165,7 +165,7 @@ describe('Voting Staking global testing', function () {
             });
 
             it("Should revert cancellation by non-owner", async function () {
-                const nextSurveyId = await surveyContract.nextSurveyId(); // Get the last created surveyId
+                const nextSurveyId = await surveyContract.nextSurveyId();
                 const surveyId = nextSurveyId.sub(BigNumber.from(1));
                 await expect(
                     surveyContract.connect(bob).cancelSurvey(surveyId)
@@ -175,7 +175,7 @@ describe('Voting Staking global testing', function () {
 
         describe("Update Survey Cost", function () {
             it("Should allow admin to update survey cost", async function () {
-                const newSurveyCost = ethers.utils.parseEther("2.0"); // New survey cost
+                const newSurveyCost = ethers.utils.parseEther("2.0");
                 await expect(
                     surveyContract.connect(deployer).updateSurveyCost(newSurveyCost)
                 ).to.emit(surveyContract, "SurveyCostUpdated");
@@ -188,15 +188,13 @@ describe('Voting Staking global testing', function () {
                 ).to.be.reverted;
             });
         });
-
-        // Additional tests can be added for other functionalities like afterVote, withdraw, etc.
     });
 
     describe("VotingContract Tests", function () {
         // Survey details
-        const surveyCost = ethers.utils.parseEther("2.0"); // Assuming 1 ether as the survey cost
+        const surveyCost = ethers.utils.parseEther("2.0");
         const descriptionUri = "http://example.com/survey";
-        const minimumStake = ethers.utils.parseEther("10"); // Minimum stake for voting in a survey
+        const minimumStake = ethers.utils.parseEther("10");
         const durationInDays = 7; // Duration of the survey in days
         let surveyId: BigNumber;
 
@@ -237,11 +235,30 @@ describe('Voting Staking global testing', function () {
                     votingContract.connect(alice).vote(surveyId, false)
                 ).to.be.revertedWith("Already voted");
             });
+
+            it("Should update the survey vote count", async function () {
+                const surveyId = 2; // Survey in which Alice voted "true"
+                const survey = await surveyContract.getSurvey(surveyId);
+                expect(survey.yesCount).to.equal(1); // 1 vote for
+                expect(survey.noCount).to.equal(0); // 0 vote against
+            })
+
+            it("Should revert when called by an admin without VOTING_CONTRACT_ROLE", async function () {
+                const surveyId = 2;
+                const voterAddress = alice.address; // Assuming Alice has participated in the survey
+                const vote = true;
+                const votingContractRole = await surveyContract.VOTING_CONTRACT_ROLE();
+
+                // Attempt to call afterVote as an admin (deployer)
+                await expect(
+                    surveyContract.connect(deployer).afterVote(surveyId, voterAddress, vote)
+                ).to.be.revertedWith("AccessControl: account " + deployer.address.toLowerCase() + " is missing role " + votingContractRole);
+            });
         });
 
         describe("Withdrawal of Contract Balance", function () {
             it("Should allow withdrawal by admin and reduce contract balance", async function () {
-                const sendAmount = ethers.utils.parseEther("1.0"); // 1 ether for example
+                const sendAmount = ethers.utils.parseEther("1.0");
                 await alice.sendTransaction({
                     to: votingContract.address,
                     value: sendAmount
@@ -262,7 +279,5 @@ describe('Voting Staking global testing', function () {
                 ).to.be.reverted;
             });
         });
-
-        // Additional tests for any other functions you might have in your VotingContract
     });
 });
