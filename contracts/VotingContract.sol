@@ -60,10 +60,10 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     function vote(uint256 _surveyId, bool _vote) external {
         ISurveyContract.Survey memory survey = surveyContract.getSurvey(_surveyId);
         require(survey.active, "Survey not active");
+        require(block.timestamp <= survey.endTimestamp, "Voting period has ended");
+
         Vote storage userVote = surveyToVoterToVote[_surveyId][msg.sender];
         require(!userVote.voted, "Already voted");
-
-        //TODO add check for endTimestamp
 
         uint256 stakedAmount = stakingContract.userToTokenToStake(msg.sender, survey.tokenAddress);
         require(stakedAmount >= survey.minimumStake, "Insufficient stake for voting");
