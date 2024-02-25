@@ -1,6 +1,6 @@
 import {BarERC20, StakingContract, SurveyContract, VotingContract} from "../typechain-types";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
-import {ethers} from "hardhat";
+import {ethers, upgrades} from "hardhat";
 import {deploy} from "./utils/deploy";
 import {expect} from "chai";
 import {BigNumber} from "ethers";
@@ -35,7 +35,8 @@ describe('Voting Staking global testing', function () {
         }
 
         // Deployer Transfers 2000 BAR from deployer to each address
-        const amount = ethers.utils.parseEther("2000");
+        const decimals = await barToken.decimals();
+        const amount = ethers.utils.parseUnits("2000", decimals);
         await barToken.connect(deployer).transfer(alice.address, amount);
         await barToken.connect(deployer).transfer(bob.address, amount);
         await barToken.connect(deployer).transfer(carol.address, amount);
@@ -47,7 +48,7 @@ describe('Voting Staking global testing', function () {
         const stakeAmount = ethers.utils.parseEther("10");
         describe("Token Staking", function () {
 
-            it("Should allow approving address 0x", async function () {
+            it("Should not allow approving address 0x", async function () {
                 await expect(
                     stakingContract
                         .connect(deployer)
@@ -55,11 +56,32 @@ describe('Voting Staking global testing', function () {
                 ).to.be.revertedWith("Token address cannot be 0x0");
             });
 
+            it("Should correctly update allowedTokenList", async function() {
+                const randomTokenAddress = ethers.Wallet.createRandom().address;
+
+                await stakingContract.connect(deployer).updateAllowedTokenList(randomTokenAddress, true);
+                await stakingContract.connect(deployer).removeAllowedToken(randomTokenAddress);
+
+                expect(await stakingContract.isTokenAllowed(randomTokenAddress)).to.equal(false);
+            });
+
             it("Should allow staking of allowed tokens", async function () {
                 await barToken.connect(alice).approve(stakingContract.address, stakeAmount);
                 await expect(
                     stakingContract.connect(alice).stake(stakeAmount, barToken.address)
                 ).to.emit(stakingContract, "Staked").withArgs(alice.address, barToken.address, stakeAmount);
+            });
+
+            it("Should only be callable by DEFAULT_ADMIN_ROLE", async function() {
+                const randomTokenAddress = ethers.Wallet.createRandom().address;
+
+                await expect(
+                    stakingContract.connect(alice).removeAllowedToken(randomTokenAddress)
+                ).to.be.reverted;
+
+                await expect(
+                    stakingContract.connect(deployer).removeAllowedToken(randomTokenAddress)
+                ).not.to.be.reverted;
             });
 
             it("Should not allow staking of non-allowed tokens", async function () {
@@ -188,6 +210,32 @@ describe('Voting Staking global testing', function () {
                 ).to.be.reverted;
             });
         });
+
+        describe("Withdrawal of Contract Balance", function () {
+            it("Should allow withdrawal by admin and reduce contract balance", async function () {
+                const initialContractBalance = await ethers.provider.getBalance(surveyContract.address);
+                const sendAmount = ethers.utils.parseEther("1.0"); // 1 ether for example
+                await alice.sendTransaction({
+                    to: surveyContract.address,
+                    value: sendAmount
+                });
+
+                expect(initialContractBalance).to.equal(sendAmount);
+
+                await surveyContract.connect(deployer).withdraw();
+
+                const finalContractBalance = await ethers.provider.getBalance(surveyContract.address);
+
+                expect(finalContractBalance).to.equal(0);
+            });
+
+
+            it("Should revert withdrawal by non-admin", async function () {
+                await expect(
+                    surveyContract.connect(alice).withdraw()
+                ).to.be.reverted;
+            });
+        });
     });
 
     describe("VotingContract Tests", function () {
@@ -220,6 +268,8 @@ describe('Voting Staking global testing', function () {
                 await expect(
                     votingContract.connect(alice).vote(surveyId, true)
                 ).to.emit(votingContract, "Voted").withArgs(surveyId, alice.address, true);
+
+                expect(await votingContract.hasVoted(surveyId, alice.address)).to.equal(true);
             });
 
             it("Should not allow voting without sufficient stake", async function () {
@@ -278,6 +328,32 @@ describe('Voting Staking global testing', function () {
                     votingContract.connect(alice).withdraw()
                 ).to.be.reverted;
             });
+        });
+    });
+
+    describe("_authorizeUpgrade Function", function() {
+        it("Should only allow upgrade by DEFAULT_ADMIN_ROLE", async function() {
+            const NewStakingContract = await ethers.getContractFactory("StakingContract");
+
+            await expect(
+                upgrades.upgradeProxy(stakingContract.address, NewStakingContract)
+            ).not.to.be.reverted;
+        });
+
+        it("Should only allow upgrade by DEFAULT_ADMIN_ROLE", async function() {
+            const NewSurveyContract = await ethers.getContractFactory("SurveyContract");
+
+            await expect(
+                upgrades.upgradeProxy(surveyContract.address, NewSurveyContract)
+            ).not.to.be.reverted;
+        });
+
+        it("Should only allow upgrade by DEFAULT_ADMIN_ROLE", async function() {
+            const NewVotingContract = await ethers.getContractFactory("VotingContract");
+
+            await expect(
+                upgrades.upgradeProxy(votingContract.address, NewVotingContract)
+            ).not.to.be.reverted;
         });
     });
 });
