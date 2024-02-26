@@ -59,4 +59,5 @@ All files             |      100 |       75 |      100 |      100 |             
  - Add Arbitration (in case of a hack, to render a survey null) => Will require additional "Status" field in Surveys (see branch "status" for draft)
  - Add NFT staking to voting conditions (will require additional fields & login in Staking & Survey contracts)
  - Use Viem instead of Ethers (didn't have time to find good viem tools for UUPS proxy deployments)
- - Add a locking period in staking contract. Tokens are locked for the duration of the survey and can be redeemed after the end timestamp or if Survey cancelled.
+ - Add a locking period in staking contract. Tokens are locked for the duration of the survey and can be redeemed after the end timestamp or if Survey cancelled
+ - Using a private variable "_surveyId" instead of a Counter for the surveyId in SurveyContract would improve gas usage

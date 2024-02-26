@@ -12,7 +12,6 @@ import "../Interfaces/IVotingContract.sol";
 /**
  * @title Survey Contract
  * @notice This contract manages the creation, cancellation, and voting of surveys.
- * @author Quentin D.C.
  * @dev Utilizes UUPS (Universal Upgradeable Proxy Standard) for upgradability.
  */
 contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradeable {

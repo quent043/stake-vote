@@ -11,7 +11,6 @@ import "../Interfaces/ISurveyContract.sol";
 /**
  * @title Voting Contract
  * @notice This contract allows users to vote on surveys based on their staked tokens.
- * @author Quentin D.C.
  * @dev This contract utilizes UUPS (Universal Upgradeable Proxy Standard) for upgradability.
  */
 contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradeable {

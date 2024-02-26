@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 /**
  * @title Staking Contract
  * @notice This contract manages the staking of ERC20 tokens.
- * @author Quentin D.C.
  * @dev Implements UUPS (Universal Upgradeable Proxy Standard) for upgradability.
  */
 contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
