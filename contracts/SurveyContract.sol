@@ -66,12 +66,19 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     /**
      * @notice Event emitted when a survey is created
      */
-    event SurveyCreated(uint256 surveyId, address owner, string descriptionUri, address tokenAddress, uint256 minimumStake, uint256 endTimestamp);
+    event SurveyCreated(
+        uint256 indexed surveyId,
+        address indexed owner,
+        string descriptionUri,
+        address tokenAddress,
+        uint256 minimumStake,
+        uint256 endTimestamp
+    );
 
     /**
      * @notice Event emitted when a survey is cancelled
      */
-    event SurveyCancelled(uint256 surveyId);
+    event SurveyCancelled(uint256 indexed surveyId);
 
     /**
      * @notice Event emitted when the survey cost is updated
@@ -81,7 +88,12 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     /**
      * @notice Event emitted when a vote is recorded on a survey
      */
-    event SurveyVoted(uint256 surveyId, address voter, bool vote);
+    event SurveyVoted(
+        uint256 indexed surveyId,
+        address indexed voter,
+        bool vote
+    );
+
 
     // =========================== View functions ==============================
 
@@ -141,7 +153,7 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         uint256 _minimumStake,
         uint256 _durationInDays
     ) payable public {
-        require(stakingContract.isTokenAllowed(_tokenAddress) == true, "Token not allowed");
+        require(stakingContract.isTokenAllowed(_tokenAddress), "Token not allowed");
         require(msg.value == surveyCost, "Incorrect amount of ETH for survey creation");
 
         uint256 currentSurveyId = nextSurveyId.current();
@@ -168,9 +180,10 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
      * @param _surveyId The ID of the survey to cancel
      */
     function cancelSurvey(uint256 _surveyId) external {
-        require(surveys[_surveyId].owner == msg.sender, "Not the owner");
-        require(surveys[_surveyId].active, "Survey not active");
-        surveys[_surveyId].active = false;
+        Survey storage survey = surveys[_surveyId];
+        require(survey.owner == msg.sender, "Not the owner");
+        require(survey.active, "Survey not active");
+        survey.active = false;
 
         emit SurveyCancelled(_surveyId);
     }

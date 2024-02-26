@@ -18,9 +18,25 @@ interface ISurveyContract {
     }
 
     // Events
-    event SurveyCreated(uint256 surveyId, address owner, string descriptionUri, address tokenAddress, uint256 minimumStake, uint256 endTimestamp);
-    event SurveyCancelled(uint256 surveyId);
+    event SurveyCreated(
+        uint256 indexed surveyId,
+        address indexed owner,
+        string descriptionUri,
+        address tokenAddress,
+        uint256 minimumStake,
+        uint256 endTimestamp
+    );
+
+    event SurveyCancelled(uint256 indexed surveyId);
+
     event SurveyCostUpdated(uint256 newCost);
+
+    event SurveyVoted(
+        uint256 indexed surveyId,
+        address indexed voter,
+        bool vote
+    );
+
 
     // Functions
     function getSurvey(uint256 surveyId) external view returns (Survey memory);
