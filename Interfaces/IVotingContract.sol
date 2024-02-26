@@ -9,6 +9,9 @@ interface IVotingContract {
         bool vote;
     }
 
+    // Events
+    event Voted(uint256 indexed surveyId, address indexed voter, bool vote);
+
     // Functions
     function hasVoted(uint256 _surveyId, address _voter) external view returns (bool);
 

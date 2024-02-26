@@ -48,7 +48,7 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     /**
      * @notice Event emitted when a vote is cast
      */
-    event Voted(uint256 surveyId, address voter, bool vote);
+    event Voted(uint256 indexed surveyId, address indexed voter, bool vote);
 
     // =========================== View functions ==============================
 
