@@ -14,7 +14,7 @@ interface IStakingContract {
     // View functions
     function isTokenAllowed(address _tokenAddress) external view returns (bool);
 
-    function userToTokenToStake(address _user, address _token) external view returns (uint256);
+    function getStakedAmount(address user, address token) external view returns (uint256);
 
     // Public functions
     function updateAllowedTokenList(address _tokenAddress, bool _isAllowed) external;

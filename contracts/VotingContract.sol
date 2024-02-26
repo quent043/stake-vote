@@ -20,12 +20,12 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     /**
      * @notice Staking Contract interface
      */
-    IStakingContract public stakingContract;
+    IStakingContract internal stakingContract;
 
     /**
      * @notice Survey Contract interface
      */
-    ISurveyContract public surveyContract;
+    ISurveyContract internal surveyContract;
 
     /**
      * @notice Structure to store vote details
@@ -40,7 +40,7 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     /**
      * @notice Mapping from survey ID to voter address to Vote struct
      */
-    mapping(uint256 => mapping(address => Vote)) public surveyToVoterToVote;
+    mapping(uint256 => mapping(address => Vote)) private surveyToVoterToVote;
 
     // =========================== Events ==============================
 
@@ -98,7 +98,7 @@ contract VotingContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         Vote storage userVote = surveyToVoterToVote[_surveyId][msg.sender];
         require(!userVote.voted, "Already voted");
 
-        uint256 stakedAmount = stakingContract.userToTokenToStake(msg.sender, survey.tokenAddress);
+        uint256 stakedAmount = stakingContract.getStakedAmount(msg.sender, survey.tokenAddress);
         require(stakedAmount >= survey.minimumStake, "Insufficient stake for voting");
 
         userVote.voted = true;

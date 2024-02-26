@@ -58,7 +58,7 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
     /**
      * @notice Mapping from survey ID to Survey struct
      */
-    mapping(uint256 => Survey) public surveys;
+    mapping(uint256 => Survey) private surveys;
 
     // =========================== Events ==============================
 
@@ -151,7 +151,7 @@ contract SurveyContract is UUPSUpgradeable, Initializable, AccessControlUpgradea
         string calldata _descriptionUri,
         uint256 _minimumStake,
         uint256 _durationInDays
-    ) payable public {
+    ) payable external {
         require(stakingContract.isTokenAllowed(_tokenAddress), "Token not allowed");
         require(msg.value == surveyCost, "Incorrect amount of ETH for survey creation");
 

@@ -17,12 +17,12 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
     /**
      * @notice Mapping from token address to their status
      */
-    mapping(address => bool) public allowedTokenList;
+    mapping(address => bool) private allowedTokenList;
 
     /**
      * @notice Mapping from user address to token address to staked amount
      */
-    mapping(address => mapping(address => uint256)) public userToTokenToStake;
+    mapping(address => mapping(address => uint256)) private userToTokenToStake;
 
 
     // =========================== Events ==============================
@@ -73,7 +73,7 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
      * @param _tokenAddress The address of the token
      * @return bool Returns true if the token is allowed, false otherwise
      */
-    function isTokenAllowed(address _tokenAddress) public view returns (bool) {
+    function isTokenAllowed(address _tokenAddress) external view returns (bool) {
         return allowedTokenList[_tokenAddress];
     }
 
@@ -83,7 +83,7 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
      * @param token The address of the token
      * @return uint256 The staked amount
      */
-    function getStakedAmount(address user, address token) public view returns (uint256) {
+    function getStakedAmount(address user, address token) external view returns (uint256) {
         return userToTokenToStake[user][token];
     }
 
