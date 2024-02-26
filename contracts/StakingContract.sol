@@ -13,11 +13,41 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
  * @dev Implements UUPS (Universal Upgradeable Proxy Standard) for upgradability.
  */
 contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgradeable {
+    // =========================== Variables & Declarations ==============================
+
+    /**
+     * @notice Mapping from token address to their status
+     */
     mapping(address => bool) public allowedTokenList;
+
+    /**
+     * @notice Mapping from user address to token address to staked amount
+     */
     mapping(address => mapping(address => uint256)) public userToTokenToStake;
 
+
+    // =========================== Events ==============================
+
+    /**
+     * @notice Emitted when a user stakes a token
+     */
     event Staked(address indexed user, address token, uint256 amount);
+
+    /**
+     * @notice Emitted when a user unstakes a token
+     */
     event UnStaked(address indexed user, address token, uint256 amount);
+
+    /**
+     * @notice Emitted when a token is added to the allowed list
+     */
+    event TokenAdded(address indexed token);
+
+    /**
+     * @notice Emitted when a token is removed from the allowed list
+     */
+    event TokenRemoved(address indexed token);
+
 
     // =========================== Initializers ==============================
 
@@ -68,6 +98,8 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
     function updateAllowedTokenList(address _tokenAddress, bool _isAllowed) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(_tokenAddress != address(0), "Token address cannot be 0x0");
         allowedTokenList[_tokenAddress] = _isAllowed;
+
+        emit TokenAdded(_tokenAddress);
     }
 
     /**
@@ -76,6 +108,8 @@ contract StakingContract is UUPSUpgradeable, Initializable, AccessControlUpgrade
      */
     function removeAllowedToken(address _tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
         allowedTokenList[_tokenAddress] = false;
+
+        emit TokenRemoved(_tokenAddress);
     }
 
     /**

@@ -7,6 +7,10 @@ interface IStakingContract {
 
     event UnStaked(address indexed user, address token, uint256 amount);
 
+    event TokenAdded(address indexed token);
+
+    event TokenRemoved(address indexed token);
+
     // View functions
     function isTokenAllowed(address _tokenAddress) external view returns (bool);
 
