@@ -5,6 +5,7 @@
 
 This project solves Part2 using a Hardhat project.
 It comes with a test file testing the deployment and all workflows.
+I assumed the surveys provided only 2 choices.
 
 
 You can run it using:
@@ -61,3 +62,4 @@ All files             |      100 |       75 |      100 |      100 |             
  - Use Viem instead of Ethers (didn't have time to find good viem tools for UUPS proxy deployments)
  - Add a locking period in staking contract. Tokens are locked for the duration of the survey and can be redeemed after the end timestamp or if Survey cancelled
  - Using a private variable "_surveyId" instead of a Counter for the surveyId in SurveyContract would improve gas usage
+ - Implement multiple choices survey, using a mapping instead of yes / no counts
